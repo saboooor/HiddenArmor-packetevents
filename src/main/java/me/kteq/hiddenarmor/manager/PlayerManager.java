@@ -76,24 +76,36 @@ public class PlayerManager implements ConfigHolder {
     }
 
     public boolean isEnabled(Player player) {
-        return this.enabledPlayersUUID.contains(player.getUniqueId());
+        try {
+            if (player == null) return false;
+            return this.enabledPlayersUUID.contains(player.getUniqueId());
+        } catch (UnsupportedOperationException e) {
+            // TemporaryPlayer during connection, armor should be visible by default
+            return false;
+        }
     }
 
     public boolean isArmorVisible(Player player) {
-        boolean hidden = isEnabled(player);
-        for (Predicate<Player> predicate : forceDisablePredicates) {
-            if (predicate.test(player)) {
-                hidden = false;
-                break;
+        try {
+            if (player == null) return true;
+            boolean hidden = isEnabled(player);
+            for (Predicate<Player> predicate : forceDisablePredicates) {
+                if (predicate.test(player)) {
+                    hidden = false;
+                    break;
+                }
             }
-        }
-        for (Predicate<Player> predicate : forceEnablePredicates) {
-            if (predicate.test(player)) {
-                hidden = true;
-                break;
+            for (Predicate<Player> predicate : forceEnablePredicates) {
+                if (predicate.test(player)) {
+                    hidden = true;
+                    break;
+                }
             }
+            return !hidden;
+        } catch (UnsupportedOperationException e) {
+            // TemporaryPlayer during connection, armor should be visible by default
+            return true;
         }
-        return !hidden;
     }
 
     private void registerDefaultPredicates() {
