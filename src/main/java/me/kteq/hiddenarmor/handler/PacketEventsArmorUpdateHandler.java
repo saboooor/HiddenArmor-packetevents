@@ -26,21 +26,21 @@ public class PacketEventsArmorUpdateHandler implements ArmorUpdateHandler {
 
     @Override
     public void updateSelf(Player player) {
-    PlayerInventory inv = player.getInventory();
+        PlayerInventory inv = player.getInventory();
 
-    for (int i = 5; i <= 8; i++) {
-        org.bukkit.inventory.ItemStack bukkitArmor = PacketEventsUtil.getArmor(
-            PacketEventsUtil.ArmorType.getType(i), inv
-        );
+        for (int i = 5; i <= 8; i++) {
+            org.bukkit.inventory.ItemStack bukkitArmor = PacketEventsUtil.getArmor(
+                PacketEventsUtil.ArmorType.getType(i), inv
+            );
 
-        com.github.retrooper.packetevents.protocol.item.ItemStack peArmor =
-            SpigotConversionUtil.fromBukkitItemStack(bukkitArmor);
+            com.github.retrooper.packetevents.protocol.item.ItemStack peArmor =
+                SpigotConversionUtil.fromBukkitItemStack(bukkitArmor);
 
-        // windowId=0 (player inventory), stateId=0, slot=i
-        WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(0, 0, i, peArmor);
+            // windowId=0 (player inventory), stateId=0, slot=i
+            WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(0, 0, i, peArmor);
 
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
-    }
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+        }
     }
 
     private void updateToOthers(Player player) {
