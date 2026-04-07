@@ -1,16 +1,14 @@
 package me.kteq.hiddenarmor.util.protocol;
 
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class PacketIndexMapper {
     private final Map<PacketFields, Integer> indexMapping;
 
-    public PacketIndexMapper(JavaPlugin plugin) {
+    public PacketIndexMapper(String version) {
         indexMapping = new HashMap<>();
-        buildMapping(plugin.getServer().getBukkitVersion().split("-")[0]);
+        buildMapping(version);
     }
 
     public int get(PacketFields packetFields) {
@@ -19,7 +17,8 @@ public class PacketIndexMapper {
 
     private void buildMapping(String version) {
         indexMapping.put(PacketFields.SET_SLOT_$WINDOW_ID, 0);
-        indexMapping.put(PacketFields.SET_SLOT_$SLOT_NUMBER, isVersionGreaterOrEqual(version, "1.16.5") ? 2 : 1);
+        indexMapping.put(PacketFields.SET_SLOT_$SLOT_NUMBER,
+            isVersionGreaterOrEqual(version, "1.16.5") ? 2 : 1);
         indexMapping.put(PacketFields.SET_SLOT_$ITEM, 0);
 
         indexMapping.put(PacketFields.WINDOW_ITEMS_$WINDOW_ID, 0);

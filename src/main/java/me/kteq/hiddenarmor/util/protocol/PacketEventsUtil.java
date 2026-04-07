@@ -1,29 +1,39 @@
 package me.kteq.hiddenarmor.util.protocol;
 
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.Pair;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class ProtocolUtil {
+public class PacketEventsUtil {
 
-    public static void broadcastPlayerPacket(ProtocolManager manager, PacketContainer packet, Player player) {
-        for(Player p : Bukkit.getOnlinePlayers()){
-            if(!(p.getWorld().equals(player.getWorld()) && p.getLocation().distance(player.getLocation()) < Bukkit.getViewDistance()*16 && !p.equals(player))) continue;
-            manager.sendServerPacket(p, packet);
+    public static void broadcastPlayerPacket(Object packet, Player player) {
+        World world = player.getWorld();
+        Location loc = player.getLocation();
+        int viewRadius = Bukkit.getViewDistance() * 16;
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!(p.getWorld().equals(world)
+                    && p.getLocation().distance(loc) < viewRadius
+                    && !p.equals(player))) {
+                continue;
+            }
+
+            PacketEvents.getAPI().getPlayerManager()
+                .sendPacket(p, packet);
         }
     }
 
-    public static boolean isArmorSlot(Pair<EnumWrappers.ItemSlot, ItemStack> pair) {
-        return pair.getFirst().equals(EnumWrappers.ItemSlot.FEET) ||
-                pair.getFirst().equals(EnumWrappers.ItemSlot.LEGS) ||
-                pair.getFirst().equals(EnumWrappers.ItemSlot.CHEST) ||
-                pair.getFirst().equals(EnumWrappers.ItemSlot.HEAD);
+    public static boolean isArmorSlot(EquipmentSlot slot) {
+        return slot == EquipmentSlot.BOOTS ||
+               slot == EquipmentSlot.LEGGINGS ||
+               slot == EquipmentSlot.CHEST_PLATE ||
+               slot == EquipmentSlot.HELMET;
     }
 
     public enum ArmorType {
@@ -32,8 +42,8 @@ public class ProtocolUtil {
         private final int value;
 
         public static ArmorType getType(int value){
-            for(int i = 0; i < values().length; i++){
-                if(values()[i].getValue() == value) return values()[i];
+            for (ArmorType type : values()) {
+                if (type.value == value) return type;
             }
             return null;
         }

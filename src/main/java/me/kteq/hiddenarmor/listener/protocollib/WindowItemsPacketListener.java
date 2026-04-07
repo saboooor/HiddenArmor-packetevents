@@ -1,4 +1,4 @@
-package me.kteq.hiddenarmor.listener.packet;
+package me.kteq.hiddenarmor.listener.protocollib;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class WindowItemsPacketListener extends PacketAdapter {
+
     private final PlayerManager playerManager;
     private final ArmorPlaceholderHandler placeholderHandler;
 

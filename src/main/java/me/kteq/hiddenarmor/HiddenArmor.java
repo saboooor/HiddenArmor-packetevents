@@ -1,23 +1,20 @@
 package me.kteq.hiddenarmor;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import me.kteq.hiddenarmor.command.HiddenArmorTabCompleter;
 import me.kteq.hiddenarmor.command.HiddenArmorCommand;
 import me.kteq.hiddenarmor.command.ToggleArmorCommand;
 import me.kteq.hiddenarmor.handler.ArmorPlaceholderHandler;
 import me.kteq.hiddenarmor.handler.ArmorUpdateHandler;
 import me.kteq.hiddenarmor.handler.MessageHandler;
-import me.kteq.hiddenarmor.listener.packet.WindowItemsPacketListener;
+import me.kteq.hiddenarmor.handler.PacketEventsHandler;
+import me.kteq.hiddenarmor.handler.PacketHandler;
+import me.kteq.hiddenarmor.handler.ProtocolLibHandler;
 import me.kteq.hiddenarmor.util.ConfigHolder;
-import me.kteq.hiddenarmor.util.protocol.PacketIndexMapper;
 import me.kteq.hiddenarmor.util.Metrics;
 import me.kteq.hiddenarmor.listener.EntityToggleGlideListener;
 import me.kteq.hiddenarmor.listener.GameModeListener;
 import me.kteq.hiddenarmor.listener.PotionEffectListener;
 import me.kteq.hiddenarmor.listener.InventoryShiftClickListener;
-import me.kteq.hiddenarmor.listener.packet.EntityEquipmentPacketListener;
-import me.kteq.hiddenarmor.listener.packet.SetSlotPacketListener;
 import me.kteq.hiddenarmor.manager.PlayerManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,7 +30,7 @@ public final class HiddenArmor extends JavaPlugin {
 
     private List<ConfigHolder> configHolders;
 
-    private ProtocolManager protocolManager;
+    private PacketHandler packetHandler;
 
     @Override
     public void onEnable() {
@@ -41,12 +38,21 @@ public final class HiddenArmor extends JavaPlugin {
         this.saveDefaultConfig();
         checkConfig();
 
-        PacketIndexMapper packetIndexMapper = new PacketIndexMapper(this);
+        // Load ProtocolLib or PacketEvents
+        if (isPluginEnabled("packetevents")) {
+            this.packetHandler = new PacketEventsHandler(this);
+            this.armorUpdater = this.packetHandler.getArmorUpdater();
+        } else if (isPluginEnabled("ProtocolLib")) {
+            this.packetHandler = new ProtocolLibHandler(this);
+            this.armorUpdater = this.packetHandler.getArmorUpdater();
+        } else {
+            getLogger().warning("No packet library found! Please install either packetevents or ProtocolLib");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         // Instantiate members
-        this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.messageHandler = new MessageHandler(this, "&c[&fHiddenArmor&c] &f");
-        this.armorUpdater = new ArmorUpdateHandler(this, packetIndexMapper);
         this.playerManager = new PlayerManager(this);
         this.armorPlaceholderHandler = new ArmorPlaceholderHandler(this);
 
@@ -59,10 +65,8 @@ public final class HiddenArmor extends JavaPlugin {
                 .setPermissionRequired(false)
                 .setTabCompleter(new HiddenArmorTabCompleter(this));
 
-        // Register ProtocolLib packet listeners
-        protocolManager.addPacketListener(new SetSlotPacketListener(this, packetIndexMapper));
-        protocolManager.addPacketListener(new WindowItemsPacketListener(this, packetIndexMapper));
-        protocolManager.addPacketListener(new EntityEquipmentPacketListener(this, packetIndexMapper));
+        // Register packet listeners
+        packetHandler.init();
 
         // Register event listeners
         new InventoryShiftClickListener(this);
@@ -88,6 +92,10 @@ public final class HiddenArmor extends JavaPlugin {
             return;
         getLogger().log(Level.WARNING, "Your HiddenArmor configuration file is outdated!");
         getLogger().log(Level.WARNING, "Please regenerate the 'config.yml' file when possible.");
+    }
+
+    private boolean isPluginEnabled(String name) {
+        return getServer().getPluginManager().isPluginEnabled(name);
     }
 
     @Override
@@ -119,7 +127,7 @@ public final class HiddenArmor extends JavaPlugin {
         return messageHandler;
     }
 
-    public ProtocolManager getProtocolManager() {
-        return protocolManager;
+    public PacketHandler getPacketHandler() {
+        return packetHandler;
     }
 }

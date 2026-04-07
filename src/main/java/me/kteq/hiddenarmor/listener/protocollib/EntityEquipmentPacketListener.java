@@ -1,4 +1,4 @@
-package me.kteq.hiddenarmor.listener.packet;
+package me.kteq.hiddenarmor.listener.protocollib;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
@@ -17,14 +17,15 @@ import me.kteq.hiddenarmor.util.ItemUtil;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 public class EntityEquipmentPacketListener extends PacketAdapter implements ConfigHolder {
-    private final PlayerManager hiddenArmorManager;
+
+    private final PlayerManager playerManager;
     private final ProtocolManager protocolManager;
 
     private boolean ignoreLeatherArmor;
@@ -34,12 +35,12 @@ public class EntityEquipmentPacketListener extends PacketAdapter implements Conf
     private final int ENTITY_ID_INDEX;
     private final int SLOT_ITEM_PAIR_LIST_INDEX;
 
-    public EntityEquipmentPacketListener(HiddenArmor plugin, PacketIndexMapper indexMapper) {
+    public EntityEquipmentPacketListener(HiddenArmor plugin, PacketIndexMapper indexMapper, ProtocolManager protocolManager) {
         super(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT);
         plugin.addConfigHolder(this);
 
-        this.hiddenArmorManager = plugin.getPlayerManager();
-        this.protocolManager = plugin.getProtocolManager();
+        this.playerManager = plugin.getPlayerManager();
+        this.protocolManager = protocolManager;
 
         this.ENTITY_ID_INDEX = indexMapper.get(PacketFields.ENTITY_EQUIPMENT_$SLOT_ITEM_PAIR_LIST);
         this.SLOT_ITEM_PAIR_LIST_INDEX = indexMapper.get(PacketFields.ENTITY_EQUIPMENT_$ENTITY_ID);
@@ -50,11 +51,11 @@ public class EntityEquipmentPacketListener extends PacketAdapter implements Conf
         PacketContainer packet = event.getPacket();
         Player player = event.getPlayer();
 
-        LivingEntity livingEntity = (LivingEntity) protocolManager.getEntityFromID(player.getWorld(), packet.getIntegers().read(ENTITY_ID_INDEX));
-        if(!(livingEntity instanceof Player)) return;
-        Player packetPlayer = (Player) livingEntity;
+        Entity entity = protocolManager.getEntityFromID(player.getWorld(), packet.getIntegers().read(ENTITY_ID_INDEX));
+        if (!(entity instanceof Player)) return;
+        Player packetPlayer = (Player) entity;
 
-        if(hiddenArmorManager.isArmorVisible(packetPlayer)) return;
+        if(playerManager.isArmorVisible(packetPlayer)) return;
 
         List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairList = packet.getSlotStackPairLists().read(SLOT_ITEM_PAIR_LIST_INDEX);
 
