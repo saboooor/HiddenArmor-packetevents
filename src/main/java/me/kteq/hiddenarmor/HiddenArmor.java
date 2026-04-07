@@ -41,15 +41,17 @@ public final class HiddenArmor extends JavaPlugin {
         // Load ProtocolLib or PacketEvents
         if (isPluginEnabled("packetevents")) {
             this.packetHandler = new PacketEventsHandler(this);
-            this.armorUpdater = this.packetHandler.getArmorUpdater();
         } else if (isPluginEnabled("ProtocolLib")) {
             this.packetHandler = new ProtocolLibHandler(this);
-            this.armorUpdater = this.packetHandler.getArmorUpdater();
         } else {
             getLogger().warning("No packet library found! Please install either packetevents or ProtocolLib");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        // Initialize packet listeners/updater before constructing dependent classes.
+        packetHandler.init();
+        this.armorUpdater = this.packetHandler.getArmorUpdater();
 
         // Instantiate members
         this.messageHandler = new MessageHandler(this, "&c[&fHiddenArmor&c] &f");
@@ -64,9 +66,6 @@ public final class HiddenArmor extends JavaPlugin {
                 .setPermission("hiddenarmor")
                 .setPermissionRequired(false)
                 .setTabCompleter(new HiddenArmorTabCompleter(this));
-
-        // Register packet listeners
-        packetHandler.init();
 
         // Register event listeners
         new InventoryShiftClickListener(this);
@@ -83,7 +82,9 @@ public final class HiddenArmor extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        playerManager.saveCurrentEnabledPlayers();
+        if (playerManager != null) {
+            playerManager.saveCurrentEnabledPlayers();
+        }
     }
 
     private void checkConfig() {
