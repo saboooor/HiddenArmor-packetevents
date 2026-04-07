@@ -17,17 +17,19 @@ import java.util.List;
 
 public class WindowItemsPacketListener implements PacketListener {
 
-    private final PlayerManager playerManager;
-    private final ArmorPlaceholderHandler placeholderHandler;
+    private final HiddenArmor plugin;
 
     public WindowItemsPacketListener(HiddenArmor plugin) {
-        this.playerManager = plugin.getPlayerManager();
-        this.placeholderHandler = plugin.getArmorPlaceholderHandler();
+        this.plugin = plugin;
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Play.Server.WINDOW_ITEMS) return;
+
+        PlayerManager playerManager = plugin.getPlayerManager();
+        ArmorPlaceholderHandler placeholderHandler = plugin.getArmorPlaceholderHandler();
+        if (playerManager == null || placeholderHandler == null) return;
 
         Player player = event.getPlayer();
         if (playerManager.isArmorVisible(player)) return;

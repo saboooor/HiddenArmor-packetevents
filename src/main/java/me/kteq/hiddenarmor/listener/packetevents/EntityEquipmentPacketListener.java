@@ -23,7 +23,6 @@ import java.util.List;
 
 public class EntityEquipmentPacketListener implements PacketListener, ConfigHolder {
 
-    private final PlayerManager playerManager;
     private final HiddenArmor plugin;
 
     private boolean ignoreLeatherArmor;
@@ -33,13 +32,15 @@ public class EntityEquipmentPacketListener implements PacketListener, ConfigHold
 
     public EntityEquipmentPacketListener(HiddenArmor plugin) {
         this.plugin = plugin;
-        this.playerManager = plugin.getPlayerManager();
         plugin.addConfigHolder(this);
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Play.Server.ENTITY_EQUIPMENT) return;
+
+        PlayerManager playerManager = plugin.getPlayerManager();
+        if (playerManager == null) return;
 
         WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
 
