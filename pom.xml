@@ -14,6 +14,7 @@
     <description>Hide players armor to show off their skins</description>
     <properties>
         <java.version>1.8</java.version>
+        <RESOURCE-PATH>${project.build.directory}/copied-artifacts</RESOURCE-PATH>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -60,7 +61,9 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/target</directory>
-                                    <include>${project.artifactId}-${project.version}.jar</include>
+                                    <includes>
+                                        <include>${project.artifactId}-${project.version}.jar</include>
+                                    </includes>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
@@ -79,6 +82,7 @@
                             <goal>read-project-properties</goal>
                         </goals>
                         <configuration>
+                            <quiet>true</quiet>
                             <files>
                                 <file>project.properties</file>
                             </files>
