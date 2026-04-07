@@ -1,4 +1,5 @@
-This plugin requires **[ProtocolLib](https://github.com/dmulloy2/ProtocolLib)** to work! (at least 5.3.0, for the latest version)
+This plugin requires **[ProtocolLib](https://github.com/dmulloy2/ProtocolLib)** (at least 5.3.0, for the latest version)
+or **[packetevents](https://github.com/retrooper/packetevents)** (at least 2.12.0, for the latest version) to work!
 
 # Hidden Armor
 ### Download:
@@ -21,7 +22,7 @@ This plugin requires **[ProtocolLib](https://github.com/dmulloy2/ProtocolLib)** 
 This plugin collects and sends anonymous data to bStats. This helps me to know how many servers and players are using it. You can disable this on the bStats config inside your plugins folder.
 
 ### Dependencies:
-- [ProtocolLib](https://github.com/dmulloy2/ProtocolLib)
+- [ProtocolLib](https://github.com/dmulloy2/ProtocolLib) or [packetevents](https://github.com/retrooper/packetevents)
 
 ### Additional Info:
 This is my first finished plugin, I initially made it for my private server with friends, and then decided to share it. 
