@@ -1,41 +1,11 @@
 package me.kteq.hiddenarmor.util.protocol;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class PacketEventsUtil {
-
-    public static void broadcastPlayerPacket(Object packet, Player player) {
-        World world = player.getWorld();
-        Location loc = player.getLocation();
-        int viewRadius = Bukkit.getViewDistance() * 16;
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!(p.getWorld().equals(world)
-                    && p.getLocation().distance(loc) < viewRadius
-                    && !p.equals(player))) {
-                continue;
-            }
-
-            PacketEvents.getAPI().getPlayerManager()
-                .sendPacket(p, packet);
-        }
-    }
-
-    public static boolean isArmorSlot(EquipmentSlot slot) {
-        return slot == EquipmentSlot.BOOTS ||
-               slot == EquipmentSlot.LEGGINGS ||
-               slot == EquipmentSlot.CHEST_PLATE ||
-               slot == EquipmentSlot.HELMET;
-    }
-
     public enum ArmorType {
         HELMET(5), CHEST(6), LEGGS(7), BOOTS(8);
 
